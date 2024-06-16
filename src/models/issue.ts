@@ -1,4 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { IssueStatus } from './IssueStatus';  // Import the enum
 
 @Entity()
 export class Issue {
@@ -11,8 +12,12 @@ export class Issue {
   @Column()
   description: string;
 
-  @Column()
-  status: string;
+  @Column({
+    type: 'enum',
+    enum: IssueStatus,
+    default: IssueStatus.OPEN
+  })
+  status: IssueStatus;
 
   @CreateDateColumn()
   createdAt: Date;

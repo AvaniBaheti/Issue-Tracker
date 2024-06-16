@@ -4,6 +4,9 @@ import { useParams } from 'next/navigation';
 import Navbar from '../../../components/navbar';
 import { supabase } from '../../../utils/supabaseClient';
 import ReactMarkdown from 'react-markdown';
+import rehypeRaw from 'rehype-raw';
+import rehypeSanitize from 'rehype-sanitize';
+import remarkGfm from 'remark-gfm';
 
 const IssueDetail: React.FC = () => {
   const params = useParams();
@@ -46,9 +49,12 @@ const IssueDetail: React.FC = () => {
       <div className="container mx-auto mt-4">
         <h1 className="text-2xl font-bold mb-4">Name: {issue.title}</h1>
         <div className="prose mb-4">
-          Description: <ReactMarkdown>{issue.description}</ReactMarkdown>
+          <strong>Description:</strong>
+          <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw, rehypeSanitize]}>
+            {issue.description}
+          </ReactMarkdown>
         </div>
-        <p className="mb-4">Status: {issue.status}</p>
+        <p className="mb-4"><strong>Status:</strong> {issue.status}</p>
       </div>
     </div>
   );

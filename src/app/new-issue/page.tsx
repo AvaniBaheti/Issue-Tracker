@@ -1,15 +1,19 @@
-'use client'
+'use client';
+
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import Navbar from '../../components/navbar';
 import { supabase } from '../../utils/supabaseClient';
 import MarkdownEditor from '../../components/MarkdownEditor';
+import { IssueStatus } from '../../models/IssueStatus';
+import { Button, TextField } from '@radix-ui/themes';
+import StatusDropdown from '../../components/StatusDropdown';
+import IssueChart from '../../components/IssueChart'; // Import the IssueChart component
 
 const NewIssue: React.FC = () => {
   const router = useRouter();
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
-  const [status, setStatus] = useState('');
+  const [status, setStatus] = useState<IssueStatus>(IssueStatus.OPEN);
   const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -32,40 +36,34 @@ const NewIssue: React.FC = () => {
   };
 
   return (
-    <div>
-      <div className="container mx-auto mt-4">
-        <h1 className="text-2xl font-bold mb-4 mx-16">Add Issue</h1>
+    <div className="container mx-auto mt-4 flex">
+      <div className="w-2/3 ml-12">
         {error && <p className="text-red-500">{error}</p>}
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
-            <label className="block text-gray-700 border border-black">Title</label>
-            <input
-              type="text"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              className="w-full px-4 py-2 border border-black rounded-md"
-            />
+            <div className='max-w-xl mb-4'>
+              <TextField.Root placeholder='Title' onChange={(e) => setTitle(e.target.value)}>
+              </TextField.Root>
+            </div>
           </div>
-          <div className="mb-4">
-            <label className="block text-gray-700">Description</label>
+          <div className="mb-4 max-w-xl max-h-md">
             <MarkdownEditor value={description} onChange={setDescription} />
           </div>
           <div className="mb-4">
             <label className="block text-gray-700">Status</label>
-            <input
-              type="text"
-              value={status}
-              onChange={(e) => setStatus(e.target.value)}
-              className="w-full px-4 py-2 border rounded-md"
-            />
+            <StatusDropdown status={status} onChange={setStatus} />
           </div>
-          <button type="submit" className="px-4 py-2 bg-blue-500 text-white rounded-md">
+          <Button type="submit" className="px-6 py-4 font-bold text-md bg-black text-white rounded-md">
             Create
-          </button>
+          </Button>
         </form>
+      </div>
+      <div className="w-1/3 mr-40">
+        <IssueChart />
       </div>
     </div>
   );
 };
+
 
 export default NewIssue;
