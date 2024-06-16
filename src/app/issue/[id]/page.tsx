@@ -43,7 +43,6 @@ const IssueDetail: React.FC = () => {
 
   return (
     <div>
-      <Navbar />
       <div className="container mx-auto mt-4">
         <h1 className="text-2xl font-bold mb-4">Name: {issue.title}</h1>
         <div className="prose mb-4">

@@ -33,7 +33,6 @@ const NewIssue: React.FC = () => {
 
   return (
     <div>
-      <Navbar />
       <div className="container mx-auto mt-4">
         <h1 className="text-2xl font-bold mb-4 mx-16">Add Issue</h1>
         {error && <p className="text-red-500">{error}</p>}
