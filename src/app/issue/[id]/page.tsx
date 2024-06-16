@@ -14,7 +14,7 @@ const IssueDetail: React.FC = () => {
   const [issue, setIssue] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
+  
   useEffect(() => {
     const fetchIssue = async () => {
       try {

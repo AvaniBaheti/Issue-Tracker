@@ -7,28 +7,45 @@ import MarkdownEditor from '../../components/MarkdownEditor';
 import { IssueStatus } from '../../models/IssueStatus';
 import { Button, TextField } from '@radix-ui/themes';
 import StatusDropdown from '../../components/StatusDropdown';
-import IssueChart from '../../components/IssueChart'; // Import the IssueChart component
+import IssueChart from '../../components/IssueChart';
 
 const NewIssue: React.FC = () => {
   const router = useRouter();
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
+  const [email, setEmail] = useState('');
   const [status, setStatus] = useState<IssueStatus>(IssueStatus.OPEN);
   const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     console.log('Form submitted');
-    console.log({ title, description, status });
+    console.log({ title, description, status, email });
+
     try {
       const { data, error } = await supabase.from('issues').insert([{ title, description, status }]);
       if (error) {
         console.error('Error inserting issue:', error);
         setError(error.message);
-      } else {
-        console.log('Issue created:', data);
-        router.push('/');
+        return;
       }
+
+      console.log('Issue created:', data);
+
+      // Send email to the assigned user
+      const response = await fetch('/api/sendEmail', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, title, description: `You have been assigned an issue.\n\n${description}` }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to send email');
+      }
+
+      router.push('/');
     } catch (err) {
       console.error('Unexpected error:', err);
       setError('Unexpected error occurred');
@@ -41,13 +58,16 @@ const NewIssue: React.FC = () => {
         {error && <p className="text-red-500">{error}</p>}
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
-            <div className='max-w-xl mb-4'>
-              <TextField.Root placeholder='Title' onChange={(e) => setTitle(e.target.value)}>
-              </TextField.Root>
+            <div className="max-w-xl mb-4">
+              <TextField.Root placeholder="Title" onChange={(e) => setTitle(e.target.value)} />
             </div>
           </div>
           <div className="mb-4 max-w-xl max-h-md">
             <MarkdownEditor value={description} onChange={setDescription} />
+          </div>
+          <div className="mb-4 max-w-xl">
+            <label className="block text-gray-700">Assignee Email</label>
+            <TextField.Root placeholder="Email" onChange={(e) => setEmail(e.target.value)} />
           </div>
           <div className="mb-4">
             <label className="block text-gray-700">Status</label>
@@ -64,6 +84,5 @@ const NewIssue: React.FC = () => {
     </div>
   );
 };
-
 
 export default NewIssue;
