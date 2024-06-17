@@ -27,7 +27,7 @@ const NewIssue: React.FC = () => {
     resolver: zodResolver(schema),
   });
   const [status, setStatus] = useState<IssueStatus>(IssueStatus.OPEN);
-  const [priority, setPriority] = useState(2); // Default to medium priority
+  const [priority, setPriority] = useState('Medium'); // Default to Medium priority
   const [users, setUsers] = useState<any[]>([]);
   const [error, setError] = useState<string | null>(null);
 
@@ -108,14 +108,14 @@ const NewIssue: React.FC = () => {
 
   const getPriorityColor = () => {
     switch (priority) {
-      case 1:
-        return 'bg-blue-500';
-      case 2:
-        return 'bg-green-500';
-      case 3:
-        return 'bg-red-500';
+      case 'Low':
+        return 'text-blue-500';
+      case 'Medium':
+        return 'text-green-500';
+      case 'High':
+        return 'text-red-500';
       default:
-        return 'bg-gray-500';
+        return 'text-gray-500';
     }
   };
 
@@ -186,14 +186,12 @@ const NewIssue: React.FC = () => {
                   type="range"
                   min="1"
                   max="3"
-                  value={priority}
-                  onChange={(e) => setPriority(Number(e.target.value))}
+                  value={priority === 'Low' ? 1 : priority === 'Medium' ? 2 : 3}
+                  onChange={(e) => setPriority(e.target.value === '1' ? 'Low' : e.target.value === '2' ? 'Medium' : 'High')}
                   className={`w-full h-2 rounded-lg cursor-pointer ${getPriorityColor()}`}
                 />
-                <div className="ml-4">
-                  {priority === 1 && <span className="text-blue-500">Low</span>}
-                  {priority === 2 && <span className="text-green-500">Medium</span>}
-                  {priority === 3 && <span className="text-red-500">High</span>}
+                <div className={`ml-4 ${getPriorityColor()}`}>
+                  {priority}
                 </div>
               </div>
             </div>
