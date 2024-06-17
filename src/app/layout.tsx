@@ -4,6 +4,8 @@ import "./globals.css";
 import Navbar from "@/components/navbar";
 import '@radix-ui/themes/styles.css'
 import {Theme} from '@radix-ui/themes'
+import { ToastContainer } from 'react-toastify';
+
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
@@ -21,7 +23,10 @@ export default function RootLayout({
       <body className={inter.className}>
         <Theme>
           <Navbar/>
-          <main className="p-5">{children}</main>
+          <main className="p-5">
+            {children}
+            <ToastContainer/>
+          </main>
         </Theme>
         </body>
     </html>

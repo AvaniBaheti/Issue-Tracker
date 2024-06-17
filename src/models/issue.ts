@@ -12,6 +12,9 @@ export class Issue {
   @Column()
   description: string;
 
+  @Column()
+  priority: string; 
+  
   @Column({
     type: 'enum',
     enum: IssueStatus,

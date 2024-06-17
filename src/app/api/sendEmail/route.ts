@@ -10,14 +10,13 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const transporter = nodemailer.createTransport({
-      host: process.env.SMTP_HOST,
-      port: Number(process.env.SMTP_PORT),
-      secure: false, // true for 465, false for other ports
+    var transporter = nodemailer.createTransport({
+      host: "sandbox.smtp.mailtrap.io",
+      port: 2525,
       auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS,
-      },
+        user: "ca7ef1509cdff4",
+        pass: "15c07202c2b5e1"
+      }
     });
 
     // Convert Markdown to HTML
@@ -28,7 +27,6 @@ export async function POST(req: NextRequest) {
       to: email, // list of receivers
       subject: `New Issue Assigned: ${title}`, // Subject line
       html: `
-        <p>You have been assigned an issue.</p>
         <h2>${title}</h2>
         <div>${htmlDescription}</div>
       `, // HTML body
