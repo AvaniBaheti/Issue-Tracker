@@ -1,8 +1,6 @@
-'use client'
+'use client';
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
-import Navbar from '../../../components/navbar';
-import { supabase } from '../../../utils/supabaseClient';
 import ReactMarkdown from 'react-markdown';
 import rehypeRaw from 'rehype-raw';
 import rehypeSanitize from 'rehype-sanitize';
@@ -14,7 +12,7 @@ const IssueDetail: React.FC = () => {
   const [issue, setIssue] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  
+
   useEffect(() => {
     const fetchIssue = async () => {
       try {
@@ -23,13 +21,13 @@ const IssueDetail: React.FC = () => {
           return;
         }
         console.log('Fetching issue with ID:', id);
-        const { data, error } = await supabase.from('issues').select('*').eq('id', id).single();
-        console.log('Fetched data:', data);
-        if (error || !data) {
-          setError('Issue not found');
-        } else {
-          setIssue(data);
+        const response = await fetch(`/api/issues/${id}`);
+        if (!response.ok) {
+          throw new Error('Failed to fetch issue');
         }
+        const data = await response.json();
+        console.log('Fetched data:', data);
+        setIssue(data);
       } catch (error) {
         console.error('Error fetching issue:', error);
         setError('An error occurred while fetching the issue.');

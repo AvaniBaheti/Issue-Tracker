@@ -1,8 +1,8 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne } from 'typeorm';
-import { IssueStatus } from './IssueStatus';  
-import { User } from './user'; 
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn } from 'typeorm';
+import { IssueStatus } from './IssueStatus';
+import { User } from './user';
 
-@Entity()
+@Entity({ name: 'issues' })
 export class Issue {
   @PrimaryGeneratedColumn()
   id: number;
@@ -13,16 +13,13 @@ export class Issue {
   @Column()
   description: string;
 
-  @Column()
-  priority: string; 
-  
-  @ManyToOne(() => User)
-  assignee: User;
+  @Column({nullable:true})
+  priority: string;
 
   @Column({
     type: 'enum',
     enum: IssueStatus,
-    default: IssueStatus.OPEN
+    default: IssueStatus.OPEN,
   })
   status: IssueStatus;
 
@@ -31,5 +28,11 @@ export class Issue {
 
   @UpdateDateColumn()
   updatedAt: Date;
-}
 
+  @Column()
+  assignee: number; 
+
+  @ManyToOne(() => User)
+  @JoinColumn({ name: 'assignee' }) 
+  assigneeUser: User;
+}

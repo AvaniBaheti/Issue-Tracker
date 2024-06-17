@@ -1,13 +1,13 @@
 import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
 
-@Entity()
+@Entity({name:'users'})
 export class User {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({nullable:true})
   name: string;
 
-  @Column({ unique: true })
+  @Column({ unique: true, nullable:true})
   email: string;
 }

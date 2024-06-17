@@ -1,9 +1,7 @@
-'use client'
+'use client';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import Navbar from '../components/navbar';
-import { supabase } from '../utils/supabaseClient';
-import './globals.css'
+import './globals.css';
 
 const Home: React.FC = () => {
   const [issues, setIssues] = useState<any[]>([]);
@@ -13,12 +11,12 @@ const Home: React.FC = () => {
   useEffect(() => {
     const fetchIssues = async () => {
       try {
-        const { data, error } = await supabase.from('issues').select('*');
-        if (error) {
-          setError(error.message);
-        } else {
-          setIssues(data);
+        const response = await fetch('/api/issues');
+        if (!response.ok) {
+          throw new Error('Failed to fetch issues');
         }
+        const data = await response.json();
+        setIssues(data);
       } catch (error) {
         setError('An error occurred while fetching issues.');
       } finally {
@@ -30,16 +28,12 @@ const Home: React.FC = () => {
 
   if (loading) return (
     <div>
-    
       <p>Loading...</p>
     </div>
-  )
+  );
   if (error) return (
-    <>
-
-    <div>Error: {error}</div>;
-    </>
-  )
+    <div>Error: {error}</div>
+  );
 
   return (
     <div>
