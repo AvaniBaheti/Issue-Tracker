@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation';
 import { useForm, Controller } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { supabase } from '../../utils/supabaseClient';
 import MarkdownEditor from '../../components/MarkdownEditor';
 import { IssueStatus } from '../../models/IssueStatus';
 import { Button, TextField } from '@radix-ui/themes';
@@ -34,12 +33,14 @@ const NewIssue: React.FC = () => {
 
   useEffect(() => {
     const fetchUsers = async () => {
-      const { data, error } = await supabase.from('users').select('*');
-      if (error) {
+      try {
+        const response = await fetch('/api/users');
+        const data = await response.json();
+        setUsers(data);
+      } catch (error) {
         console.error('Error fetching users:', error);
-        return;
+        setError('Error fetching users');
       }
-      setUsers(data);
     };
 
     fetchUsers();
@@ -54,7 +55,7 @@ const NewIssue: React.FC = () => {
       }
 
       // Send email to the assigned user
-      const response = await fetch('/api/sendEmail', {
+      const emailResponse = await fetch('/api/sendEmail', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -68,30 +69,34 @@ const NewIssue: React.FC = () => {
         }),
       });
 
-      if (!response.ok) {
-        const errorMessage = await response.text();
+      if (!emailResponse.ok) {
+        const errorMessage = await emailResponse.text();
         throw new Error(errorMessage || 'Failed to send email');
       }
 
       notifySuccess('Email to user sent successfully');
 
-      const createdAt = new Date().toISOString();
+      // Add the issue using the API
+      const issueResponse = await fetch('/api/issues', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          title: data.title,
+          description: data.description,
+          status,
+          priority,
+          assignee: assignee.id,
+        }),
+      });
 
-      const { data: insertedData, error } = await supabase.from('issues').insert([{
-        title: data.title,
-        description: data.description,
-        status,
-        priority,
-        createdAt,
-        assignee: assignee.id,
-      }]);
-
-      if (error) {
-        console.error('Error inserting issue:', error);
-        notifyError(`Error creating issue: ${error.message}`);
-        return;
+      if (!issueResponse.ok) {
+        const errorMessage = await issueResponse.text();
+        throw new Error(errorMessage || 'Failed to create issue');
       }
 
+      const insertedData = await issueResponse.json();
       console.log('Issue created:', insertedData);
       router.push('/');
     } catch (err) {
