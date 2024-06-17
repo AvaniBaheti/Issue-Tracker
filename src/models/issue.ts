@@ -1,5 +1,6 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn } from 'typeorm';
-import { IssueStatus } from './IssueStatus';  // Import the enum
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne } from 'typeorm';
+import { IssueStatus } from './IssueStatus';  
+import { User } from './user'; 
 
 @Entity()
 export class Issue {
@@ -15,6 +16,9 @@ export class Issue {
   @Column()
   priority: string; 
   
+  @ManyToOne(() => User)
+  assignee: User;
+
   @Column({
     type: 'enum',
     enum: IssueStatus,
@@ -28,3 +32,4 @@ export class Issue {
   @UpdateDateColumn()
   updatedAt: Date;
 }
+

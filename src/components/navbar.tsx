@@ -20,6 +20,11 @@ const Navbar = () => {
           </Link>
         </li>
         <li>
+          <Link href='/add-user' className={`text-zinc-500 hover:text-zinc-800 ${pathname === '/add-user' ? 'text-zinc-800' : ''}`}>
+            Add User
+          </Link>
+        </li>
+        <li>
           <Link href='/new-issue' className={`text-zinc-500 hover:text-zinc-800 ${pathname === '/new-issue' ? 'text-zinc-800' : ''}`}>
             Create Issue
           </Link>
