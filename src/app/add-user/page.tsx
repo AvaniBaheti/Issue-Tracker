@@ -44,10 +44,11 @@ const AddUser: React.FC = () => {
   };
 
   return (
-    <div className="container mt-4 justify-center items-center ml-96">
-      <h1 className="text-2xl font-bold mb-4">Add User</h1>
+    <div className="mt-8 justify-center items-center text-center mx-auto">
+      <h1 className="text-3xl font-bold mb-12 ">Add User to Assignee List</h1>
+      <p className='text-center text-md mb-16 max-w-2xl ml-96 pl-20'>Add user to assignee list so that you can directly select user while creating an issue. Our app will help you create issue in an efficient manner.</p>
       <form onSubmit={handleSubmit(onSubmit)}>
-        <div className="mb-4 max-w-xl">
+        <div className="mb-4 max-w-xl ml-96 pl-40">
           <Controller
             name="name"
             control={control}
@@ -60,7 +61,7 @@ const AddUser: React.FC = () => {
             )}
           />
         </div>
-        <div className="mb-4 max-w-xl">
+        <div className="mb-4 max-w-xl ml-96 pl-40">
           <Controller
             name="email"
             control={control}
@@ -73,7 +74,7 @@ const AddUser: React.FC = () => {
             )}
           />
         </div>
-        <Button type="submit" className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-[#90ee90] hover:text-black hover:cursor-pointer">
+        <Button type="submit" className="px-4 py-2  bg-blue-500 text-white rounded-md hover:bg-[#90ee90] hover:text-black hover:cursor-pointer">
           Add User
         </Button>
       </form>
