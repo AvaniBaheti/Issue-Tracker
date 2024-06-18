@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useForm, Controller } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -23,13 +23,16 @@ type FormData = z.infer<typeof schema>;
 
 const NewIssue: React.FC = () => {
   const router = useRouter();
-  const { control, handleSubmit, formState: { errors } } = useForm<FormData>({
+  const searchParams = useSearchParams();
+  const issueId = searchParams.get('id');
+  const { control, handleSubmit, formState: { errors }, reset } = useForm<FormData>({
     resolver: zodResolver(schema),
   });
   const [status, setStatus] = useState<IssueStatus>(IssueStatus.OPEN);
   const [priority, setPriority] = useState('Medium'); // Default to Medium priority
   const [users, setUsers] = useState<any[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [oldAssignee, setOldAssignee] = useState<number | null>(null);
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -46,6 +49,30 @@ const NewIssue: React.FC = () => {
     fetchUsers();
   }, []);
 
+  useEffect(() => {
+    if (issueId) {
+      const fetchIssue = async () => {
+        try {
+          const response = await fetch(`/api/issues/${issueId}`);
+          const data = await response.json();
+          reset({
+            title: data.title,
+            description: data.description,
+            assignee: data.assignee.toString(),
+          });
+          setStatus(data.status);
+          setPriority(data.priority);
+          setOldAssignee(data.assignee);
+        } catch (error) {
+          console.error('Error fetching issue:', error);
+          setError('Error fetching issue');
+        }
+      };
+
+      fetchIssue();
+    }
+  }, [issueId, reset]);
+
   const onSubmit = async (data: FormData) => {
     try {
       const assignee = users.find(user => user.id === parseInt(data.assignee));
@@ -54,31 +81,80 @@ const NewIssue: React.FC = () => {
         return;
       }
 
-      // Send email to the assigned user
-      const emailResponse = await fetch('/api/sendEmail', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          email: assignee.email,
-          title: data.title,
-          description: `You have been assigned an issue.\n\n${data.description} \n\n Status:${status} \n\n Priority: ${priority}`,
-          priority,
-          status,
-        }),
-      });
+      const emailRequests = [];
 
-      if (!emailResponse.ok) {
-        const errorMessage = await emailResponse.text();
-        throw new Error(errorMessage || 'Failed to send email');
+      if (issueId) {
+        // If updating an issue
+        if (oldAssignee === assignee.id) {
+          // If assignee is the same, send updated issue email
+          emailRequests.push(fetch('/api/sendEmail', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              email: assignee.email,
+              title: `Updated Issue: ${data.title}`,
+              description: `Your issue has been updated.\n\n Title: ${data.title}\n\n Description:\n\n ${data.description}\n\n Status: ${status}\n\n Priority: ${priority}`,
+            }),
+          }));
+        } else {
+          // If assignee has changed
+          emailRequests.push(fetch('/api/sendEmail', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              email: assignee.email,
+              title: `New Issue Assigned: ${data.title}`,
+              description: `You have been assigned an issue.\n\n Title: ${data.title}\n\n Description:\n\n ${data.description}\n\n Status: ${status}\n\n Priority: ${priority}`,
+            }),
+          }));
+
+          const oldAssigneeData = users.find(user => user.id === oldAssignee);
+          if (oldAssigneeData) {
+            emailRequests.push(fetch('/api/sendEmail', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                email: oldAssigneeData.email,
+                title: `Updated Issue: ${data.title}`,
+                description: `You are no longer assigned to this issue. Please work on other issues assigned to you.`,
+              }),
+            }));
+          }
+        }
+      } else {
+        // If creating a new issue
+        emailRequests.push(fetch('/api/sendEmail', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            email: assignee.email,
+            title: `New Issue Assigned: ${data.title}`,
+            description: `You have been assigned an issue.\n\n Title: ${data.title}\n\n Description:\n\n ${data.description}\n\n Status: ${status}\n\n Priority: ${priority}`,
+          }),
+        }));
       }
 
-      notifySuccess('Email to user sent successfully');
+      const emailResponses = await Promise.all(emailRequests);
+      const emailErrors = emailResponses.filter(res => !res.ok);
+      if (emailErrors.length > 0) {
+        throw new Error('Failed to send one or more emails');
+      }
 
-      // Add the issue using the API
-      const issueResponse = await fetch('/api/issues', {
-        method: 'POST',
+      notifySuccess('Email sent successfully');
+
+      const method = issueId ? 'PATCH' : 'POST';
+      const endpoint = issueId ? `/api/issues/${issueId}` : '/api/issues';
+
+      const response = await fetch(endpoint, {
+        method,
         headers: {
           'Content-Type': 'application/json',
         },
@@ -91,13 +167,13 @@ const NewIssue: React.FC = () => {
         }),
       });
 
-      if (!issueResponse.ok) {
-        const errorMessage = await issueResponse.text();
-        throw new Error(errorMessage || 'Failed to create issue');
+      if (!response.ok) {
+        const errorMessage = await response.text();
+        throw new Error(errorMessage || `Failed to ${issueId ? 'update' : 'create'} issue`);
       }
 
-      const insertedData = await issueResponse.json();
-      console.log('Issue created:', insertedData);
+      const successMessage = issueId ? 'Issue updated successfully' : 'Issue created successfully';
+      notifySuccess(successMessage);
       router.push('/');
     } catch (err) {
       console.error('Unexpected error:', err);
@@ -197,7 +273,7 @@ const NewIssue: React.FC = () => {
             </div>
           </div>
           <Button type="submit" className="px-6 py-4 font-bold text-md bg-black text-white rounded-md hover:cursor-pointer">
-            Create
+            {issueId ? 'Update' : 'Create'}
           </Button>
         </form>
         {error && <p className="text-red-500">{error}</p>}

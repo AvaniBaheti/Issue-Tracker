@@ -25,7 +25,7 @@ export async function POST(req: NextRequest) {
     const mailOptions = {
       from: process.env.SMTP_FROM, // sender address
       to: email, // list of receivers
-      subject: `New Issue Assigned: ${title}`, // Subject line
+      subject: `${title}`, // Subject line
       html: `
         <h2>${title}</h2>
         <div>${htmlDescription}</div>
