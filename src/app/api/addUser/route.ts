@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabase } from '../../../utils/supabaseClient';
+import { connectDatabase, AppDataSource } from '../../../utils/db';
+import { User } from '../../../models/user';
 
 export async function POST(req: NextRequest) {
   const { name, email } = await req.json();
@@ -9,14 +10,16 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const { error } = await supabase.from('users').insert([{ name, email }]);
+    await connectDatabase();
+    const userRepository = AppDataSource.getRepository(User);
+    const user = new User();
+    user.name = name;
+    user.email = email;
+    const savedUser = await userRepository.save(user);
 
-    if (error) {
-      return NextResponse.json({ message: `Error adding user: ${error.message}` }, { status: 500 });
-    }
-
-    return NextResponse.json({ message: 'User added successfully' }, { status: 200 });
+    return NextResponse.json({ message: 'User added successfully', user: savedUser }, { status: 200 });
   } catch (error) {
+    console.error('Error adding user:', error);
     return NextResponse.json({ message: 'Unexpected error occurred' }, { status: 500 });
   }
 }
