@@ -12,7 +12,6 @@ import StatusDropdown from '../../components/StatusDropdown';
 import IssueChart from '../../components/IssueChart';
 import { notifySuccess, notifyError } from '../../utils/toast';
 
-// Define the validation schema
 const schema = z.object({
   title: z.string().nonempty('Title is required'),
   description: z.string().nonempty('Description is required'),
@@ -29,7 +28,7 @@ const NewIssue: React.FC = () => {
     resolver: zodResolver(schema),
   });
   const [status, setStatus] = useState<IssueStatus>(IssueStatus.OPEN);
-  const [priority, setPriority] = useState('Medium'); // Default to Medium priority
+  const [priority, setPriority] = useState('Medium'); 
   const [users, setUsers] = useState<any[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [oldAssignee, setOldAssignee] = useState<number | null>(null);
@@ -84,9 +83,7 @@ const NewIssue: React.FC = () => {
       const emailRequests = [];
 
       if (issueId) {
-        // If updating an issue
         if (oldAssignee === assignee.id) {
-          // If assignee is the same, send updated issue email
           emailRequests.push(fetch('/api/sendEmail', {
             method: 'POST',
             headers: {
@@ -99,7 +96,6 @@ const NewIssue: React.FC = () => {
             }),
           }));
         } else {
-          // If assignee has changed
           emailRequests.push(fetch('/api/sendEmail', {
             method: 'POST',
             headers: {
@@ -128,7 +124,6 @@ const NewIssue: React.FC = () => {
           }
         }
       } else {
-        // If creating a new issue
         emailRequests.push(fetch('/api/sendEmail', {
           method: 'POST',
           headers: {

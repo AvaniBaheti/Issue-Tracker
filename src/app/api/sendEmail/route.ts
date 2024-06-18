@@ -19,17 +19,16 @@ export async function POST(req: NextRequest) {
       }
     });
 
-    // Convert Markdown to HTML
     const htmlDescription = marked(description);
 
     const mailOptions = {
-      from: process.env.SMTP_FROM, // sender address
-      to: email, // list of receivers
-      subject: `${title}`, // Subject line
+      from: process.env.SMTP_FROM, 
+      to: email, 
+      subject: `${title}`, 
       html: `
         <h2>${title}</h2>
         <div>${htmlDescription}</div>
-      `, // HTML body
+      `,
     };
 
     await transporter.sendMail(mailOptions);

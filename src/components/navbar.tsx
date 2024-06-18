@@ -29,6 +29,11 @@ const Navbar = () => {
             Create Issue
           </Link>
         </li>
+        <li>
+          <Link href='/users' className={`text-zinc-500 hover:text-zinc-800 ${pathname === '/users' ? 'text-zinc-800' : ''}`}>
+            Users
+          </Link>
+        </li>
       </ul>
     </nav>
   );

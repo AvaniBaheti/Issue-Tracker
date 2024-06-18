@@ -8,7 +8,7 @@ import remarkGfm from 'remark-gfm';
 
 const IssueDetail: React.FC = () => {
   const params = useParams();
-  const id = params?.id; // Accessing the dynamic route parameter
+  const id = params?.id; 
   const [issue, setIssue] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
