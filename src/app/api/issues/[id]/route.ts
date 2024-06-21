@@ -4,7 +4,10 @@ import { Issue } from '../../../../models/issue';
 
 export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
   await connectDatabase();
-  const issue = await AppDataSource.getRepository(Issue).findOne({ where: { id: parseInt(params.id) } });
+  const issue = await AppDataSource.getRepository(Issue).findOne({
+    where: { id: parseInt(params.id) },
+    relations: ['assigneeUser'],
+  });
   if (!issue) {
     return NextResponse.json({ message: 'Issue not found' }, { status: 404 });
   }

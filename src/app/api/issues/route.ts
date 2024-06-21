@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { connectDatabase, AppDataSource } from '../../../utils/db';
 import { Issue } from '../../../models/issue';
+import { User } from '../../../models/user';
 
 export async function GET() {
   await connectDatabase();
-  const issues = await AppDataSource.getRepository(Issue).find();
+  const issues = await AppDataSource.getRepository(Issue).find({ relations: ['assigneeUser'] });
   return NextResponse.json(issues);
 }
 
