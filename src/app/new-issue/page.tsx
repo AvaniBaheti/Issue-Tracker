@@ -32,6 +32,7 @@ const NewIssue: React.FC = () => {
   const [users, setUsers] = useState<any[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [oldAssignee, setOldAssignee] = useState<number | null>(null);
+  const [loading, setLoading] = useState<boolean>(true); // Loading state
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -65,10 +66,14 @@ const NewIssue: React.FC = () => {
         } catch (error) {
           console.error('Error fetching issue:', error);
           setError('Error fetching issue');
+        } finally {
+          setLoading(false); // Set loading to false after data is fetched
         }
       };
 
       fetchIssue();
+    } else {
+      setLoading(false); // Set loading to false if no issueId
     }
   }, [issueId, reset]);
 
@@ -192,90 +197,100 @@ const NewIssue: React.FC = () => {
 
   return (
     <div className="container mx-auto mt-4 flex">
-      <div className="w-2/3 ml-12">
-        <form onSubmit={handleSubmit(onSubmit)}>
-          <div className="mb-4 max-w-xl">
-            <Controller
-              name="title"
-              control={control}
-              defaultValue=""
-              render={({ field }) => (
-                <div>
-                  <TextField.Root placeholder="Title" {...field} />
-                  {errors.title && <p className="text-red-500">{errors.title.message}</p>}
-                </div>
-              )}
-            />
-          </div>
-          <div className="mb-4 max-w-xl max-h-md">
-            <Controller
-              name="description"
-              control={control}
-              defaultValue=""
-              render={({ field }) => (
-                <div>
-                  <MarkdownEditor {...field} />
-                  {errors.description && <p className="text-red-500">{errors.description.message}</p>}
-                </div>
-              )}
-            />
-          </div>
-          <div className="mb-4 max-w-xl">
-            <label className="block text-gray-700">Assignee</label>
-            <Controller
-              name="assignee"
-              control={control}
-              defaultValue=""
-              render={({ field }) => (
-                <div>
-                  {users.length > 0 ? (
-                    <select {...field} className="w-full px-4 py-2 border rounded-md">
-                      <option value="" disabled>Select Assignee</option>
-                      {users.map(user => (
-                        <option key={user.id} value={user.id}>{user.name}</option>
-                      ))}
-                    </select>
-                  ) : (
+      {loading ? ( 
+        <div className="w-full flex justify-center items-center">
+          <div className="spinner"></div> 
+        </div>
+      ) : (
+        <div className="flex w-full">
+          <div className="w-2/3 ml-12">
+            <form onSubmit={handleSubmit(onSubmit)}>
+              <div className="mb-4 max-w-xl">
+                <Controller
+                  name="title"
+                  control={control}
+                  defaultValue=""
+                  render={({ field }) => (
                     <div>
-                      <p>No users found. Please <a href="/add-user" className="text-blue-500">add a user</a>.</p>
+                      <TextField.Root placeholder="Title" {...field} />
+                      {errors.title && <p className="text-red-500">{errors.title.message}</p>}
                     </div>
                   )}
-                  {errors.assignee && <p className="text-red-500">{errors.assignee.message}</p>}
-                </div>
-              )}
-            />
-          </div>
-          <div className='flex'>
-            <div className="mb-4 mr-16">
-              <label className="block text-gray-700">Status</label>
-              <StatusDropdown status={status} onChange={setStatus} />
-            </div>
-            <div className="mb-4">
-              <label className="block text-gray-700 mb-2">Priority</label>
-              <div className="flex items-center">
-                <input
-                  type="range"
-                  min="1"
-                  max="3"
-                  value={priority === 'Low' ? 1 : priority === 'Medium' ? 2 : 3}
-                  onChange={(e) => setPriority(e.target.value === '1' ? 'Low' : e.target.value === '2' ? 'Medium' : 'High')}
-                  className={`w-full h-2 rounded-lg cursor-pointer ${getPriorityColor()}`}
                 />
-                <div className={`ml-4 ${getPriorityColor()}`}>
-                  {priority}
+              </div>
+              <div className="mb-4 max-w-xl max-h-md">
+                <Controller
+                  name="description"
+                  control={control}
+                  defaultValue=""
+                  render={({ field }) => (
+                    <div>
+                      <MarkdownEditor {...field} />
+                      {errors.description && <p className="text-red-500">{errors.description.message}</p>}
+                    </div>
+                  )}
+                />
+              </div>
+              <div className="mb-4 max-w-xl">
+                <label className="block text-gray-700">Assignee</label>
+                <Controller
+                  name="assignee"
+                  control={control}
+                  defaultValue=""
+                  render={({ field }) => (
+                    <div>
+                      {users.length > 0 ? (
+                        <select {...field} className="w-full px-4 py-2 border rounded-md">
+                          <option value="" disabled>Select Assignee</option>
+                          {users.map(user => (
+                            <option key={user.id} value={user.id}>{user.name}</option>
+                          ))}
+                        </select>
+                      ) : (
+                        <div>
+                          <p>No users found. Please <a href="/add-user" className="text-blue-500">add a user</a>.</p>
+                        </div>
+                      )}
+                      {errors.assignee && <p className="text-red-500">{errors.assignee.message}</p>}
+                    </div>
+                  )}
+                />
+              </div>
+              <div className='flex'>
+                <div className="mb-4 mr-16">
+                  <label className="block text-gray-700">Status</label>
+                  <StatusDropdown status={status} onChange={setStatus} />
+                </div>
+                <div className="mb-4">
+                  <label className="block text-gray-700 mb-2">Priority</label>
+                  <div className="flex items-center">
+                    <input
+                      type="range"
+                      min="1"
+                      max="3"
+                      value={priority === 'Low' ? 1 : priority === 'Medium' ? 2 : 3}
+                      onChange={(e) => setPriority(e.target.value === '1' ? 'Low' : e.target.value === '2' ? 'Medium' : 'High')}
+                      className={`w-full h-2 rounded-lg cursor-pointer ${getPriorityColor()}`}
+                    />
+                    <div className={`ml-4 ${getPriorityColor()}`}>
+                      {priority}
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
+              <Button type="submit" className="px-6 py-4 font-bold text-md hover:bg-gray-500 bg-black text-white rounded-md hover:cursor-pointer">
+                {issueId ? 'Update' : 'Create'}
+              </Button>
+            </form>
+            {error && <p className="text-red-500">{error}</p>}
           </div>
-          <Button type="submit" className="px-6 py-4 font-bold text-md bg-black text-white rounded-md hover:cursor-pointer">
-            {issueId ? 'Update' : 'Create'}
-          </Button>
-        </form>
-        {error && <p className="text-red-500">{error}</p>}
-      </div>
-      <div className="w-1/3 mr-40">
-        <IssueChart />
-      </div>
+          {!loading && (
+            <div className="w-1/3 mr-40">
+              <IssueChart />
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 };

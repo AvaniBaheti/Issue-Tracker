@@ -43,9 +43,9 @@ const Home: React.FC = () => {
   };
 
   if (loading) return (
-    <div>
-      <p>Loading...</p>
-    </div>
+      <div className="w-full flex justify-center items-center">
+        <div className="spinner"></div> 
+      </div>
   );
   if (error) return (
     <div>Error: {error}</div>
