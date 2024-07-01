@@ -38,7 +38,11 @@ const IssueDetail=() => {
     fetchIssue();
   }, [id]);
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) return (
+    <div className="w-full flex justify-center items-center">
+          <div className="spinner"></div> 
+        </div>
+  );
   if (error) return <div>Error: {error}</div>;
   if (!issue) return <div>Issue not found</div>;
 
