@@ -7,7 +7,7 @@ interface StatusDropdownProps {
   onChange: (status: IssueStatus) => void;
 }
 
-const StatusDropdown: React.FC<StatusDropdownProps> = ({ status, onChange }) => {
+const StatusDropdown = ({ status, onChange }:StatusDropdownProps) => {
   const getStatusIcon = (status: IssueStatus) => {
     switch (status) {
       case IssueStatus.OPEN:

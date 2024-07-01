@@ -7,7 +7,7 @@ interface MarkdownEditorProps {
   onChange: (value: string) => void;
 }
 
-const MarkdownEditor: React.FC<MarkdownEditorProps> = ({ value, onChange }) => {
+const MarkdownEditor= ({ value, onChange }:MarkdownEditorProps) => {
   return (
     <SimpleMDE value={value} onChange={onChange} />
   );

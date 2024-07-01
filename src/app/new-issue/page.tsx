@@ -20,7 +20,7 @@ const schema = z.object({
 
 type FormData = z.infer<typeof schema>;
 
-const NewIssue: React.FC = () => {
+const NewIssue= () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const issueId = searchParams.get('id');
@@ -67,13 +67,13 @@ const NewIssue: React.FC = () => {
           console.error('Error fetching issue:', error);
           setError('Error fetching issue');
         } finally {
-          setLoading(false); // Set loading to false after data is fetched
+          setLoading(false); 
         }
       };
 
       fetchIssue();
     } else {
-      setLoading(false); // Set loading to false if no issueId
+      setLoading(false); 
     }
   }, [issueId, reset]);
 

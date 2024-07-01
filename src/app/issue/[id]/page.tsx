@@ -6,7 +6,7 @@ import rehypeRaw from 'rehype-raw';
 import rehypeSanitize from 'rehype-sanitize';
 import remarkGfm from 'remark-gfm';
 
-const IssueDetail: React.FC = () => {
+const IssueDetail=() => {
   const params = useParams();
   const id = params?.id; 
   const [issue, setIssue] = useState<any>(null);

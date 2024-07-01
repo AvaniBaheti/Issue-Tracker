@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { Button } from '@radix-ui/themes';
 import { notifySuccess, notifyError } from '../../utils/toast';
 
-const Users: React.FC = () => {
+const Users= () => {
   const [users, setUsers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
