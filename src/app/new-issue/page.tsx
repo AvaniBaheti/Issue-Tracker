@@ -20,7 +20,7 @@ const schema = z.object({
 
 type FormData = z.infer<typeof schema>;
 
-const NewIssue= () => {
+const NewIssue = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const issueId = searchParams.get('id');
@@ -85,6 +85,30 @@ const NewIssue= () => {
         return;
       }
 
+      const method = issueId ? 'PATCH' : 'POST';
+      const endpoint = issueId ? `/api/issues/${issueId}` : '/api/issues';
+
+      const response = await fetch(endpoint, {
+        method,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          title: data.title,
+          description: data.description,
+          status,
+          priority,
+          assignee: assignee.id,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorMessage = await response.text();
+        throw new Error(errorMessage || `Failed to ${issueId ? 'update' : 'create'} issue`);
+      }
+
+      const issueData = await response.json();
+
       const emailRequests = [];
 
       if (issueId) {
@@ -138,7 +162,6 @@ const NewIssue= () => {
             email: assignee.email,
             title: `New Issue Assigned: ${data.title}`,
             description: `You have been assigned an issue.\n\n Title: ${data.title}\n\n Description:\n\n ${data.description}\n\n Status: ${status}\n\n Priority: ${priority}`,
-            
           }),
         }));
       }
@@ -150,28 +173,6 @@ const NewIssue= () => {
       }
 
       notifySuccess('Email sent successfully');
-
-      const method = issueId ? 'PATCH' : 'POST';
-      const endpoint = issueId ? `/api/issues/${issueId}` : '/api/issues';
-
-      const response = await fetch(endpoint, {
-        method,
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          title: data.title,
-          description: data.description,
-          status,
-          priority,
-          assignee: assignee.id,
-        }),
-      });
-
-      if (!response.ok) {
-        const errorMessage = await response.text();
-        throw new Error(errorMessage || `Failed to ${issueId ? 'update' : 'create'} issue`);
-      }
 
       const successMessage = issueId ? 'Issue updated successfully' : 'Issue created successfully';
       notifySuccess(successMessage);

@@ -26,8 +26,62 @@ export async function POST(req: NextRequest) {
       to: email, 
       subject: `${title}`, 
       html: `
+        <style>
+          body {
+            font-family: Arial, sans-serif;
+          }
+          h2 {
+            color: #333;
+          }
+          p {
+            line-height: 1.5;
+          }
+          a {
+            color: #1a0dab;
+            text-decoration: none;
+          }
+          a:hover {
+            text-decoration: underline;
+          }
+          img {
+            max-width: 100%;
+            height: auto;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 5px;
+            background: #f8f8f8;
+          }
+          code {
+            background-color: #f8f8f8;
+            border: 1px solid #e1e1e1;
+            border-radius: 3px;
+            padding: 0.2em 0.4em;
+            font-family: 'Courier New', Courier, monospace;
+          }
+          pre {
+            background-color: #f8f8f8;
+            border: 1px solid #e1e1e1;
+            border-radius: 3px;
+            padding: 1em;
+            overflow-x: auto;
+          }
+          blockquote {
+            border-left: 4px solid #ddd;
+            padding: 0.5em 1em;
+            color: #555;
+            background-color: #f9f9f9;
+            border-radius: 3px;
+            margin: 0;
+          }
+          .description {
+            border: 1px solid #ddd;
+            padding: 10px;
+            border-radius: 4px;
+            background: #f9f9f9;
+          }
+        </style>
         <h2>${title}</h2>
-        <div>${htmlDescription}</div>
+        <div class="description">${htmlDescription}</div>
       `,
     };
 
