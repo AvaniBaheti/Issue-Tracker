@@ -138,6 +138,7 @@ const NewIssue= () => {
             email: assignee.email,
             title: `New Issue Assigned: ${data.title}`,
             description: `You have been assigned an issue.\n\n Title: ${data.title}\n\n Description:\n\n ${data.description}\n\n Status: ${status}\n\n Priority: ${priority}`,
+            
           }),
         }));
       }

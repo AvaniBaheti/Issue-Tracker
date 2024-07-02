@@ -59,7 +59,7 @@ const Home=() => {
             <thead className="bg-gray-100">
               <tr>
                 <th className="py-2 px-4 text-left">Sr No.</th>
-                <th className="py-2 px-4 text-left">Task Name</th>
+                <th className="py-2 px-4 text-left">Issue Name</th>
                 <th className="py-2 px-4 text-left">Assigned To</th>
                 <th className="py-2 px-4 text-left">Created At</th>
                 <th className="py-2 px-4 text-left">Status</th>
@@ -95,8 +95,13 @@ const Home=() => {
                           </DropdownMenu.Item>
                           <DropdownMenu.Item asChild>
                             <button
-                              className="text-blue-500 w-full text-left"
-                              onClick={() => router.push(`/new-issue?id=${issue.id}`)}
+                              className={`w-full text-left ${issue.status === 'CLOSED' ? 'text-gray-300 cursor-not-allowed' : 'text-blue-500'}`}
+                              onClick={() => {
+                                if (issue.status !== 'CLOSED') {
+                                  router.push(`/new-issue?id=${issue.id}`);
+                                }
+                              }}
+                              disabled={issue.status === 'CLOSED'}
                             >
                               Edit
                             </button>
