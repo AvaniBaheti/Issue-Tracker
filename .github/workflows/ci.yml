@@ -26,5 +26,14 @@ jobs:
       - name: Install dependencies
         run: npm install
 
+      - name: Start Next.js server
+        run: npm run start &
+        env:
+          PORT: 3000
+
+      - name: Wait for Next.js server to be ready
+        run: |
+          timeout 15 sh -c 'until nc -z localhost 3000; do sleep 1; done'
+
       - name: Run tests
         run: npm test
