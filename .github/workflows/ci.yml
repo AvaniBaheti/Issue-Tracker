@@ -1,39 +1,28 @@
-name: CI
+name: Run Tests
 
 on:
   push:
-    branches: [main]
+    branches:
+      - main
   pull_request:
-    branches: [main]
+    branches:
+      - main
 
 jobs:
   test:
     runs-on: ubuntu-latest
 
-    strategy:
-      matrix:
-        node-version: [16.x, 18.x]
-
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v2
 
       - name: Set up Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v2
         with:
-          node-version: ${{ matrix.node-version }}
+          node-version: '18'
 
       - name: Install dependencies
         run: npm install
-
-      - name: Start Next.js server
-        run: npm run start &
-        env:
-          PORT: 3000
-
-      - name: Wait for Next.js server to be ready
-        run: |
-          timeout 15 sh -c 'until nc -z localhost 3000; do sleep 1; done'
 
       - name: Run tests
         run: npm test
