@@ -85,29 +85,7 @@ const NewIssue = () => {
         return;
       }
 
-      const method = issueId ? 'PATCH' : 'POST';
-      const endpoint = issueId ? `/api/issues/${issueId}` : '/api/issues';
-
-      const response = await fetch(endpoint, {
-        method,
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          title: data.title,
-          description: data.description,
-          status,
-          priority,
-          assignee: assignee.id,
-        }),
-      });
-
-      if (!response.ok) {
-        const errorMessage = await response.text();
-        throw new Error(errorMessage || `Failed to ${issueId ? 'update' : 'create'} issue`);
-      }
-
-      const issueData = await response.json();
+      
 
       const emailRequests = [];
 
@@ -173,7 +151,29 @@ const NewIssue = () => {
       }
 
       notifySuccess('Email sent successfully');
+      const method = issueId ? 'PATCH' : 'POST';
+      const endpoint = issueId ? `/api/issues/${issueId}` : '/api/issues';
 
+      const response = await fetch(endpoint, {
+        method,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          title: data.title,
+          description: data.description,
+          status,
+          priority,
+          assignee: assignee.id,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorMessage = await response.text();
+        throw new Error(errorMessage || `Failed to ${issueId ? 'update' : 'create'} issue`);
+      }
+
+      const issueData = await response.json();
       const successMessage = issueId ? 'Issue updated successfully' : 'Issue created successfully';
       notifySuccess(successMessage);
       router.push('/');
