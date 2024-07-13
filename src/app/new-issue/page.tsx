@@ -5,12 +5,15 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useForm, Controller } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import MarkdownEditor from '../../components/MarkdownEditor';
+import dynamic from 'next/dynamic';
 import { IssueStatus } from '../../models/IssueStatus';
 import { Button, TextField } from '@radix-ui/themes';
-import StatusDropdown from '../../components/StatusDropdown';
-import IssueChart from '../../components/IssueChart';
 import { notifySuccess, notifyError } from '../../utils/toast';
+import React, { Suspense } from 'react';
+
+const MarkdownEditor = dynamic(() => import('../../components/MarkdownEditor'), { ssr: false });
+const StatusDropdown = dynamic(() => import('../../components/StatusDropdown'), { ssr: false });
+const IssueChart = dynamic(() => import('../../components/IssueChart'), { ssr: false });
 
 const schema = z.object({
   title: z.string().nonempty('Title is required'),
@@ -32,9 +35,17 @@ const NewIssue = () => {
   const [users, setUsers] = useState<any[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [oldAssignee, setOldAssignee] = useState<number | null>(null);
-  const [loading, setLoading] = useState<boolean>(true); // Loading state
+  const [loading, setLoading] = useState<boolean>(true); 
+  const [isClient, setIsClient] = useState(false);
+
 
   useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  useEffect(() => {
+    if (!isClient) return;
+
     const fetchUsers = async () => {
       try {
         const response = await fetch('/api/users');
@@ -47,9 +58,11 @@ const NewIssue = () => {
     };
 
     fetchUsers();
-  }, []);
+  }, [isClient]);
 
   useEffect(() => {
+    if (!isClient) return;
+
     if (issueId) {
       const fetchIssue = async () => {
         try {
@@ -75,7 +88,7 @@ const NewIssue = () => {
     } else {
       setLoading(false); 
     }
-  }, [issueId, reset]);
+  }, [isClient, issueId, reset]);
 
   const onSubmit = async (data: FormData) => {
     try {
@@ -84,8 +97,6 @@ const NewIssue = () => {
         notifyError('Selected user not found');
         return;
       }
-
-      
 
       const emailRequests = [];
 
@@ -197,6 +208,10 @@ const NewIssue = () => {
     }
   };
 
+  if (!isClient) {
+    return null; 
+  }
+
   return (
     <div className="container mx-auto mt-4 flex">
       {loading ? ( 
@@ -297,4 +312,10 @@ const NewIssue = () => {
   );
 };
 
-export default NewIssue;
+export default function SuspendedNewIssue() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <NewIssue />
+    </Suspense>
+  );
+}

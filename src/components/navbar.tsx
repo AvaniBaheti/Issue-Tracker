@@ -2,7 +2,6 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import React from 'react';
-import "tailwindcss/tailwind.css";
 import { PiBugDroidDuotone } from "react-icons/pi";
 
 const Navbar = () => {

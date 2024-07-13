@@ -1,8 +1,8 @@
-@import "tailwindcss/base";
+@tailwind base;
 
-@import "tailwindcss/components";
+@tailwind components;
 
-@import "tailwindcss/utilities";
+@tailwind utilities;
 
 .spinner {
     border: 4px solid rgba(0, 0, 0, 0.1);
