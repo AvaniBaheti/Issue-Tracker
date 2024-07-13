@@ -35,17 +35,9 @@ const NewIssue = () => {
   const [users, setUsers] = useState<any[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [oldAssignee, setOldAssignee] = useState<number | null>(null);
-  const [loading, setLoading] = useState<boolean>(true); 
-  const [isClient, setIsClient] = useState(false);
-
+  const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    setIsClient(true);
-  }, []);
-
-  useEffect(() => {
-    if (!isClient) return;
-
     const fetchUsers = async () => {
       try {
         const response = await fetch('/api/users');
@@ -58,11 +50,9 @@ const NewIssue = () => {
     };
 
     fetchUsers();
-  }, [isClient]);
+  }, []);
 
   useEffect(() => {
-    if (!isClient) return;
-
     if (issueId) {
       const fetchIssue = async () => {
         try {
@@ -88,8 +78,17 @@ const NewIssue = () => {
     } else {
       setLoading(false); 
     }
-  }, [isClient, issueId, reset]);
+  }, [issueId, reset]);
 
+  const sendEmail = (email: string, title: string, description: string) => {
+    return fetch('/api/sendEmail', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email, title, description }),
+    });
+  };
   const onSubmit = async (data: FormData) => {
     try {
       const assignee = users.find(user => user.id === parseInt(data.assignee));
@@ -102,57 +101,17 @@ const NewIssue = () => {
 
       if (issueId) {
         if (oldAssignee === assignee.id) {
-          emailRequests.push(fetch('/api/sendEmail', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              email: assignee.email,
-              title: `Updated Issue: ${data.title}`,
-              description: `Your issue has been updated.\n\n Title: ${data.title}\n\n Description:\n\n ${data.description}\n\n Status: ${status}\n\n Priority: ${priority}`,
-            }),
-          }));
+          emailRequests.push(sendEmail(assignee.email, `Updated Issue: ${data.title}`, `Your issue has been updated.\n\n Title: ${data.title}\n\n Description:\n\n ${data.description}\n\n Status: ${status}\n\n Priority: ${priority}`));
         } else {
-          emailRequests.push(fetch('/api/sendEmail', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              email: assignee.email,
-              title: `New Issue Assigned: ${data.title}`,
-              description: `You have been assigned an issue.\n\n Title: ${data.title}\n\n Description:\n\n ${data.description}\n\n Status: ${status}\n\n Priority: ${priority}`,
-            }),
-          }));
+          emailRequests.push(sendEmail(assignee.email, `New Issue Assigned: ${data.title}`, `You have been assigned an issue.\n\n Title: ${data.title}\n\n Description:\n\n ${data.description}\n\n Status: ${status}\n\n Priority: ${priority}`));
 
           const oldAssigneeData = users.find(user => user.id === oldAssignee);
           if (oldAssigneeData) {
-            emailRequests.push(fetch('/api/sendEmail', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify({
-                email: oldAssigneeData.email,
-                title: `Updated Issue: ${data.title}`,
-                description: `You are no longer assigned to this issue. Please work on other issues assigned to you.`,
-              }),
-            }));
+            emailRequests.push(sendEmail(oldAssigneeData.email, `Updated Issue: ${data.title}`, `You are no longer assigned to this issue. Please work on other issues assigned to you.`));
           }
         }
       } else {
-        emailRequests.push(fetch('/api/sendEmail', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            email: assignee.email,
-            title: `New Issue Assigned: ${data.title}`,
-            description: `You have been assigned an issue.\n\n Title: ${data.title}\n\n Description:\n\n ${data.description}\n\n Status: ${status}\n\n Priority: ${priority}`,
-          }),
-        }));
+        emailRequests.push(sendEmail(assignee.email, `New Issue Assigned: ${data.title}`, `You have been assigned an issue.\n\n Title: ${data.title}\n\n Description:\n\n ${data.description}\n\n Status: ${status}\n\n Priority: ${priority}`));
       }
 
       const emailResponses = await Promise.all(emailRequests);
@@ -195,6 +154,8 @@ const NewIssue = () => {
     }
   };
 
+
+
   const getPriorityColor = () => {
     switch (priority) {
       case 'Low':
@@ -208,16 +169,10 @@ const NewIssue = () => {
     }
   };
 
-  if (!isClient) {
-    return null; 
-  }
-
   return (
     <div className="container mx-auto mt-4 flex">
-      {loading ? ( 
-        <div className="w-full flex justify-center items-center">
-          <div className="spinner"></div> 
-        </div>
+      {loading ? (
+        <LoadingSpinner />
       ) : (
         <div className="flex w-full">
           <div className="w-2/3 ml-12">
@@ -301,16 +256,20 @@ const NewIssue = () => {
             </form>
             {error && <p className="text-red-500">{error}</p>}
           </div>
-          {!loading && (
-            <div className="w-1/3 mr-40">
-              <IssueChart />
-            </div>
-          )}
+          <div className="w-1/3 mr-40">
+            <IssueChart />
+          </div>
         </div>
       )}
     </div>
   );
 };
+
+const LoadingSpinner = () => (
+  <div className="w-full flex justify-center items-center">
+    <div className="spinner"></div>
+  </div>
+);
 
 export default function SuspendedNewIssue() {
   return (
