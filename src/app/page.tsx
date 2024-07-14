@@ -4,8 +4,9 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 import './globals.css';
+import RollingPhrases from '@/components/rollingPhrases';
 
-const Home=() => {
+const Home = () => {
   const [issues, setIssues] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -43,40 +44,45 @@ const Home=() => {
   };
 
   if (loading) return (
-      <div className="w-full flex justify-center items-center">
-        <div className="spinner"></div> 
-      </div>
+    <div className="w-full flex justify-center items-center">
+      <div className="spinner"></div> 
+    </div>
   );
   if (error) return (
     <div>Error: {error}</div>
   );
 
   return (
-    <div className="container mx-auto mt-4 px-24">
+    <>
+    <h1 className="font-heading font-medium pt-2 w-[95%] lg:w-full text-[70px] flex flex-col justify-center text-black mt-2 mb-8 mx-0"
+                id="lp-intro-text-roll">
+                <RollingPhrases />
+    </h1>
+    <div className="container mx-auto mt-4 px-4 md:px-8 lg:px-24">
       <div className="overflow-x-auto">
-        <div className="max-w-7xl mx-auto border border-gray-300 rounded-lg">
+        <div className="max-w-full mx-auto border border-gray-300 rounded-lg">
           <table className="min-w-full bg-white rounded-lg overflow-hidden">
             <thead className="bg-gray-100">
               <tr>
-                <th className="py-2 px-4 text-left">Sr No.</th>
-                <th className="py-2 px-4 text-left">Issue Name</th>
-                <th className="py-2 px-4 text-left">Assigned To</th>
-                <th className="py-2 px-4 text-left">Created At</th>
-                <th className="py-2 px-4 text-left">Status</th>
-                <th className="py-2 px-4 text-left">Priority</th>
-                <th className="py-2 px-4 text-left"></th>
+                <th className="py-2 px-2 md:px-4 text-left">Sr No.</th>
+                <th className="py-2 px-2 md:px-4 text-left">Issue Name</th>
+                <th className="py-2 px-2 md:px-4 text-left">Assigned To</th>
+                <th className="py-2 px-2 md:px-4 text-left">Created At</th>
+                <th className="py-2 px-2 md:px-4 text-left">Status</th>
+                <th className="py-2 px-2 md:px-4 text-left">Priority</th>
+                <th className="py-2 px-2 md:px-4 text-left"></th>
               </tr>
             </thead>
             <tbody>
               {issues.map((issue, index) => (
                 <tr key={issue.id} className="border-b last:border-none">
-                  <td className="py-2 px-4">{index + 1}</td>
-                  <td className="py-2 px-4">{issue.title}</td>
-                  <td className="py-2 px-4">{issue.assigneeUser ? issue.assigneeUser.name : 'Unassigned'}</td>
-                  <td className="py-2 px-4">{new Date(issue.createdAt).toLocaleString()}</td>
-                  <td className="py-2 px-4">{issue.status}</td>
-                  <td className="py-2 px-4">{issue.priority}</td>
-                  <td className="py-2 px-4 text-right">
+                  <td className="py-2 px-2 md:px-4">{index + 1}</td>
+                  <td className="py-2 px-2 md:px-4">{issue.title}</td>
+                  <td className="py-2 px-2 md:px-4">{issue.assigneeUser ? issue.assigneeUser.name : 'Unassigned'}</td>
+                  <td className="py-2 px-2 md:px-4">{new Date(issue.createdAt).toLocaleString()}</td>
+                  <td className="py-2 px-2 md:px-4">{issue.status}</td>
+                  <td className="py-2 px-2 md:px-4">{issue.priority}</td>
+                  <td className="py-2 px-2 md:px-4 text-right">
                     <div className="relative">
                       <DropdownMenu.Root>
                         <DropdownMenu.Trigger asChild>
@@ -130,6 +136,7 @@ const Home=() => {
         </div>
       </div>
     </div>
+    </>
   );
 };
 

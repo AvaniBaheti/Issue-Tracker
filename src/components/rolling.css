@@ -1,0 +1,92 @@
+.scene {
+    /* width: 7em; */
+    height: 1.4em;
+    margin-top: 10px;
+    perspective: 10em;
+  }
+  @media (max-width: 768px) {
+    .scene {
+      /* width: 10em; */
+      height: 1.5em;
+    }
+  }
+  @media (max-width: 1024px) {
+    .scene {
+      /* width: 15em; */
+      height: 1.5em;
+    }
+  }
+
+  .cube {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    animation: spinning 7s infinite;
+    transform-style: preserve-3d;
+  }
+  
+  @keyframes spinning {
+    0%,
+    12.5% {
+      transform: translateZ(-2em) rotateX(0deg);
+    }
+    25%,
+    37.5% {
+      transform: translateZ(-2em) rotateX(90deg);
+    }
+    50%,
+    62.5% {
+      transform: translateZ(-2em) rotateX(180deg);
+    }
+    75%,
+    87.5% {
+      transform: translateZ(-2em) rotateX(270deg);
+    }
+    100% {
+      transform: translateZ(-2em) rotateX(360deg);
+    }
+  }
+  
+  .face {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    backface-visibility: hidden;
+    color: #035d7b;
+    line-height: 1em;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 70px;
+  }
+  
+  @media (max-width: 768px) {
+    .face {
+      font-size: 20px;
+    }
+  }
+  @media (max-width: 1024px) {
+    .face {
+      font-size: 55px;
+    }
+  }
+  @media (max-width: 640px) {
+    .face {
+      font-size: 35px;
+    }
+  }
+  
+  .phrase1 {
+    transform: rotateY(0deg) translateZ(1em);
+  }
+  .phrase2 {
+    transform: rotateY(180deg) rotateZ(180deg) translateZ(1em);
+  }
+  .phrase3 {
+    transform: rotateX(90deg) translateZ(1em);
+  }
+  .phrase4 {
+    transform: rotateX(-90deg) translateZ(1em);
+  }
+  
