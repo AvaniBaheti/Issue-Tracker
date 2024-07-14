@@ -9,6 +9,6 @@ To Run it locally:
 Vercel Link to use the
 [Issue Tracker](https://issue-tracker-five-ebon.vercel.app/)
 
-##### Note:
-You wont recieve email fir the issue because currently I am using Mailtrap as email service.
+**Note**:
+You wont recieve email for the issue because currently I am using Mailtrap as email service.
 
