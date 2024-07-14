@@ -7,7 +7,7 @@ To Run it locally:
 - To check build run  ***npm run build***
 
 Vercel Link to use the Issue Tracker 
-(issue-tracker-five-ebon.vercel.app)
+[Issue Tracker](issue-tracker-five-ebon.vercel.app)!
 
 ##### Note:
 You wont recieve email fir the issue because currently I am using Mailtrap as email service.
