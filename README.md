@@ -10,5 +10,5 @@ Vercel Link to use the
 [Issue Tracker](https://issue-tracker-five-ebon.vercel.app/)
 
 **Note**:
-You wont recieve email for the issue because currently I am using testing mail services.
+You won't recieve email for the issue because currently I am using mailtrap testing mail services.
 
